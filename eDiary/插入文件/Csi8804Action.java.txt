@@ -1,0 +1,73 @@
+package com.yinhai.csi.csi8000.action;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
+import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.Namespace;
+import org.apache.struts2.convention.annotation.Result;
+import com.yinhai.common.service.DoService;
+import com.yinhai.sysframework.dto.DTO;
+import com.yinhai.sysframework.dto.ParamDTO;
+import com.yinhai.sysframework.dto.PrcDTO;
+import com.yinhai.sysframework.exception.AppException;
+import com.yinhai.sysframework.exception.PrcException;
+import com.yinhai.sysframework.util.ValidateUtil;
+import com.yinhai.webframework.BaseAction;
+import com.yinhai.webframework.session.UserSession;
+import com.yinhai.sysframework.persistence.ibatis.IDao;
+import com.yinhai.sysframework.service.BaseService;
+@Namespace("/csi")
+@Action(value="csi8804Action",
+		results={@Result(name="success",location="/webjsp/csi/csi8000/csi8804.jsp")
+	}
+)
+public class Csi8804Action  extends BaseAction{
+	private DoService dos = (DoService) super.getService("doService");  //有事务控制
+	
+	public String execute() throws Exception {
+		return "success"; 
+	}
+	public String query() throws Exception{
+		this.save();
+		Map m = new HashMap();
+		IDao dao =getDao();
+		m.put("ny",getDto().getAsString("aae030"));
+		List list =  dao.queryForList("csi1001.query_cxcbrs",m);
+		setList("list", list);
+		return JSON;
+	}
+	public String save() throws Exception{
+		String yae049 = UserSession.getUserSession(request).getCurrentBusiness().getId();
+		ParamDTO in=getDto(); //ta3里面得到前台传入的值
+		//写过程所需参数
+	    Map m = new HashMap(); 
+	    m.put("aae030", in.getAsString("aae030"));
+	    m.put("scbz", in.getAsString("scbz"));
+		in.put("prcArg", m); //过程传入参数
+	    //设置需调用过程名称
+		in.put("pkg", "pkg_cxtj_query");
+		in.put("prc", "prc_cxtj_cxwgrs");
+		 //生成日志
+	    m = new HashMap();
+	    m.put("aaa796", "127.0.0.1"); //主机ip
+	    m.put("aab034", in.getUserInfo().getOrgId());
+	    m.put("aae011", in.getUserInfo().getUserId());
+	    m.put("aaz010", in.getAsString("batchid"));
+	    m.put("aaa832", "1");
+	    m.put("aae013", "统计报表外国人参保人数");
+	    m.put("savelog","1"); //是否使用触发器生成公用回退
+	    in.put("logArg", m);//日志
+	    in.put("yae049",yae049);//必传项：菜单编号
+	    //DTO resultDto = doService.ExecutePrc(in);  //调用存错过程
+	    try{
+	    	DTO resultDto = dos.ExecutePrc(in);  //调用存错过程
+		}catch(Exception e){	
+			String msg = e.getMessage();
+			throw new AppException(msg);
+		}
+		return JSON;
+	}
+	
+}
+ 

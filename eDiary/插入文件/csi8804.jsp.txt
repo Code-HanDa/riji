@@ -1,0 +1,66 @@
+<%@ page language="java" pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<%@ taglib prefix="ta" uri="/ta3" %>
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+	<head>
+		<title>查询统计统计</title>
+		<%@ include file="/ta/inc.jsp"%>
+	</head>
+    <body class="yes-scrollbar"  >
+		<ta:pageloading/>
+		
+		<ta:toolbar id="ButtonLayout1">
+            <ta:toolbarItem id="ButtonQuery" key="查询(Q)" icon="xui-icon-add2" hotKey="Q" onClick="query()"  />
+            <ta:toolbarItem id="ButtonReset" key="重置(R)" icon="xui-icon-edit2" hotKey="R" onClick="reset()"/>
+        </ta:toolbar>
+    <ta:form id="form1" fit="true" >	    
+	<ta:fieldset key="查询条件" cols="3" id="baseinfo"  >
+	       <ta:text id="aae030" key="年月" required="true" maxLength="6"/>   
+	       <ta:text id="scbz" key="选中标志" value="0" display="false"/>   
+	       <ta:checkboxgroup cols="1" span="2" id="noclGroup" key="重新生成数据">
+				<ta:checkbox id="checkbox_v" key="" onClick="check_xx()"/>
+			</ta:checkboxgroup>
+	     <%--     <ta:text id="aac001" key="个人编号"/>   --%>
+	</ta:fieldset>
+	<ta:panel key="统计信息"  fit="true" heightDiff="100">
+		<ta:datagrid  id="list"   haveSn="true" fit="true"  >
+			<ta:datagridItem id="ny" key="查询月份" dataAlign="right" width="90"/>
+			<ta:datagridItem id="xz" key="查询险种" dataAlign="right" width="90"/>
+			<ta:datagridItem id="sy" key="松原人数" dataAlign="right" width="200"/>
+			<ta:datagridItem id="fy" key="扶余人数" dataAlign="right" width="200"/>
+			<ta:datagridItem id="qg" key="前郭人数" dataAlign="right" width="200"/>
+			<ta:datagridItem id="qa" key="乾安人数" dataAlign="right" width="200"/>
+			<ta:datagridItem id="cl" key="长岭人数" dataAlign="right" width="200"/>
+		</ta:datagrid>
+	</ta:panel>
+</ta:form>
+</body>
+</html>
+<script type="text/javascript">
+$(document).ready(function () {
+	$("body").taLayout();
+	Base.focus("aae030");
+	Base.setValue('checkbox_v','0');
+});
+	function query(){
+	
+		if(!Base.validateForm('form1', true)){
+			Base.alert("打红星的为必录项，不能为空");	
+			return;
+	    }	
+	    	Base.clearGridData("list");
+	    	Base.submit("baseinfo","csi8804Action!query.do",null,null,false,null,null);
+	}
+	function check_xx(){
+		 if(Base.getObj("checkbox_v").checked){
+		 Base.setValue('scbz','1');
+		 }else{
+		 Base.setValue('scbz','0');
+		 }
+   }
+	function reset(){
+		 Base.resetForm('form1');
+		 Base.clearGridData("list");
+   }
+</script>
+<%@ include file="/ta/incfooter.jsp"%>

@@ -1,0 +1,1179 @@
+<?xml version="1.0" encoding="GB2312" standalone="no"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<!-- 表aa01 (综合参数) 的所有SQL语句映射配置表  生成时间：2012-09-17 12:12:58 -->
+<sqlMap namespace="csi1001">
+	<typeAlias alias="csi1001Domain" type="com.yinhai.csi.csi1000.domain.Csi1001Domain"/>
+	<!--如果在resultClass中返回是dto或map,则用resultClass="dto"-->
+
+
+<!--YHCIPBEGIN--> 
+	<!-- 查询行政区划 -->
+	<select id="queryAab301ForOrg" parameterClass="map" resultClass="dto">
+		SELECT 
+		       a.aaa102 as aaa102,
+		       a.aaa103 as aaa103
+		  FROM aa10 a 
+	     WHERE a.aaa102 like '2207%'
+	       AND aaa100 ='AAB301'
+	     ORDER BY a.aaa102 asc
+		
+	
+	
+	</select>
+	<!-- 查询行政区划 -->
+	<select id="query_cxcbrs" parameterClass="map" resultClass="dto">
+		select AAA027,  
+				XZ,           
+       				SY||'人' as sy,               
+       				FY||'人' as fy,                 
+       				QG||'人' as qg,                 
+       				QA||'人' as qa,              
+       				CL||'人' as cl,                  
+       				NY
+  from QUERY_CBRS  
+  where 1 = 1 
+  and bz = '1'
+  and  ny  = #ny:VARCHAR# 
+	</select>
+	 <!-- 校验税务机构名称是否存在 --> 
+	<select id="getCorpCHKaab069af06" parameterClass="map" resultClass="java.lang.Integer">
+	SELECT COUNT(1) AS VALUE
+	  FROM ( SELECT d.aab069,d.aab003
+	           FROM AF06 a,AE10 d
+	          WHERE 1=1
+	          	AND a.aaz066 = d.aaz001
+	          	AND d.yab003 = #yab003#
+		<isNotEmpty prepend="AND" property="aab069">   <!-- 名称         -->
+		       d.aab069 = #aab069:VARCHAR#              
+		</isNotEmpty>  
+		)
+	</select>
+	
+	<!-- 校验税务机构编号是否重复 --> 
+	<select id="getCorpCHKaaf020" parameterClass="map" resultClass="java.lang.Integer">
+	SELECT COUNT(1) AS VALUE
+	  FROM ( SELECT d.aab069,d.aab003
+	           FROM AF06 b,AE10 d
+	          WHERE 1=1
+	          	AND b.aaz066 = d.aaz001
+		<isNotEmpty prepend="AND" property="aaf020">   <!-- 单位管理码   -->
+		       b.aaf020 = #aaf020:VARCHAR#              
+		</isNotEmpty> 
+	         )
+	</select>
+	
+	<!-- 校验组织机构代码是否重复 --> 
+	<select id="getCorpCHKaab003" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT COUNT(1) AS VALUE
+	    FROM ( SELECT c.aab003
+	             FROM Af06 b, AE10 c
+	            WHERE 1=1
+                 AND b.aaz066 = c.aaz001
+		<isNotEmpty prepend="AND" property="aab003">   <!-- 单位管理码   -->
+		       c.aab003 = #aab003:VARCHAR#              
+		</isNotEmpty> 
+	         )
+	</select>
+	
+	
+		<!-- 业务日志信息查询 汤尊-->
+	  <select id="getLogInfo" parameterClass="map" resultClass="java.util.HashMap">
+	SELECT AE02.AAA121,
+       AE02.AAE016,
+       AE02.AAE217,
+       AE02.AAE218,
+       (SELECT C.AAC003 FROM AD53A4 C WHERE C.YAE092 = AE02.AAE011) AAE011,
+       (SELECT C.AAC003 FROM AD53A4 C WHERE C.YAE092 = AE02.AAE014) AAE014
+  FROM AE02A2 AE02, AD53A4 B
+ WHERE B.YAE092 = AE02.AAE011
+ 	<isNotEmpty prepend="AND" property="aaa121">
+   		AE02.AAA121 = #aaa121#
+   </isNotEmpty>
+   <isNotEmpty prepend="AND" property="aac003">
+   		B.AAC003 = #aac003#
+   </isNotEmpty>
+   <isNotEmpty prepend="AND" property="aae217">
+   		<![CDATA[ AE02.AAE217 >= TO_DATE(#aae217#,'yyyy-MM-dd') ]]>
+   </isNotEmpty>
+   <isNotEmpty prepend="AND" property="aae218">
+   		<![CDATA[ AE02.AAE218 <= TO_DATE(#aae218#,'yyyy-MM-dd')]]>
+   </isNotEmpty>
+   <isNotEmpty prepend="AND" property="aae016">
+   		AE02.AAE016 = #aae016#
+   </isNotEmpty>
+   <isNotEmpty prepend="AND" property="yab003">
+   		AE02.yab003 = #yab003#
+   </isNotEmpty>
+ ORDER BY AE02.AAZ002
+</select>
+<!--  查询qrtz_job_msgs中信息oracle定时任务执行结果汤尊-->
+	<select id="queryOracleJobIdForMsg" parameterClass="map" resultClass="dto">
+		SELECT a.id            as id,
+		       a.jobid         as jobid,
+		       a.job_name      as job_name,
+		       a.userid        as useid,
+		       a.execstarttime as execstarttime,
+		       a.execendtime   as execendtime,
+		       CASE WHEN a.issuccess = '1' THEN '成功' 
+		            ELSE '失败'  END  as issuccess,
+		       a.successmsg    as successmsg,
+		       a.errormsg      as errormsg,
+		       a.ywpch         as ywpch,
+		       a.ywlsh         as ywlsh
+		  FROM qrtz_job_msgs a
+		  WHERE 1=1
+		  <isNotEmpty prepend="AND" property="jobid">
+		 	a.jobid = #jobid# 
+		 </isNotEmpty>
+		 <isNotEmpty prepend="AND" property="issuccess">
+		   	a.issuccess = #issuccess# 
+		   </isNotEmpty>
+	</select>	
+	<!-- 定时任务 汤尊-->
+	<select id="getOracleJobSICP3" parameterClass="map" resultClass="java.util.HashMap">
+        
+SELECT  a.JOBID AS JOBID,a.JOB_NAME AS JOB_NAME,
+        (CASE
+          WHEN a.ISSUCCESS = '1' THEN
+           '成功'
+          ELSE
+           '失败'
+        END) AS ISSUCCESS ,a.USERID AS USERID
+   FROM QRTZ_JOB_MSGS a
+         where a.JOBID like upper('%'||#inputstring#||'%')
+        or a.JOBID like lower('%'||#inputstring#||'%')
+       
+          <![CDATA[ and rownum <100     ]]>
+    </select>
+     <!-- 人员重要信息变更  汤尊-->
+    <select id="getBaseChange" parameterClass="map" resultClass="java.util.HashMap">
+			SELECT AC31.AAE155,
+		       CASE
+		         WHEN (SELECT COUNT(1)
+		                 FROM AA10A1
+		                WHERE AAA100 = UPPER(AC31.AAE122)
+		                  AND AAA102 = AC31.AAE123) > 0 THEN
+		          (SELECT AAA103
+		             FROM AA10A1
+		            WHERE AAA100 = UPPER(AC31.AAE122)
+		              AND AAA102 = AC31.AAE123)
+		         ELSE
+		          AC31.AAE123
+		       END AS AAE123,
+		       CASE
+		         WHEN (SELECT COUNT(1)
+		                 FROM AA10A1
+		                WHERE AAA100 = UPPER(AC31.AAE122)
+		                  AND AAA102 = AC31.AAE124) > 0 THEN
+		          (SELECT AAA103
+		             FROM AA10A1
+		            WHERE AAA100 = UPPER(AC31.AAE122)
+		              AND AAA102 = AC31.AAE124)
+		         ELSE
+		          AC31.AAE124
+		       END AS AAE124,
+		       AC01.AAC003,
+		       ac01.aac999,
+		       AC01.AAC002,
+		       AC30.AAE035,
+		       J.AAC003 AS JBR,
+		       TO_CHAR(AC30.AAE036, 'YYYY-MM-DD hh24:mi:ss') AAE036,
+		       F.AAC003 AS FHR,
+		       TO_CHAR(AC30.AAE015, 'YYYY-MM-DD') AAE015
+		  FROM AC30 AC30, AC31 AC31, AC01 AC01, AD53A4 J, AD53A4 F
+		 WHERE AC30.AAZ206 = AC31.AAZ206
+		   AND AC30.AAC001 = AC01.AAC001
+		   AND AC30.AAE011 = J.YAE092
+		   AND AC30.AAE014 = F.YAE092
+	     <isNotEmpty prepend="AND" property="aac058"> 
+	     	AC01.AAC058 = #aac058#
+	     </isNotEmpty>
+	     <isNotEmpty prepend="AND" property="aac001"> 
+	     	AC01.AAC001 = #aac001#
+	     </isNotEmpty>
+	     <isNotEmpty prepend="AND" property="jbr"> 
+	     	J.aae011 = #jbr#
+	     </isNotEmpty>
+	     <isNotEmpty prepend="AND" property="yab003"> 
+	     	J.yab003 = #yab003#
+	     </isNotEmpty>
+	     <isNotEmpty prepend="AND" property="fhr"> 
+	     	F.AAC003 = #fhr#
+	     </isNotEmpty>
+	     <isNotEmpty prepend="AND" property="aae016"> 
+	     	AC30.AAE016 = #aae016#
+	     </isNotEmpty>
+	     <isNotEmpty prepend="AND" property="aae036"> 
+	     	<![CDATA[ TO_CHAR(AC30.AAE036, 'YYYY-MM-DD') >= #aae036# ]]>
+	     </isNotEmpty>
+	     <isNotEmpty prepend="AND" property="aae037"> 
+	     	<![CDATA[ TO_CHAR(AC30.AAE036, 'YYYY-MM-DD') <= #aae037# ]]>
+	     </isNotEmpty>
+	     <isNotEmpty prepend="AND" property="aae122"> 
+	     	AC31.AAE122 = #aae122#
+	     </isNotEmpty>
+	     order by ac30.aae036
+     </select>
+     <!-- 获取个人基本信息汤尊 -->
+     <select id="getinforname" parameterClass="map" resultClass="java.util.HashMap">
+      select a.aac003,a.aac001,a.aac002
+      from ac01 a
+      where a.aac999=#aac999#
+     </select>
+      <!-- 获取基本信息公共方法 2012-4-23去掉经办机构汤尊-->
+     <select id="getCzAc01ListByAsnBaseSICP3" parameterClass="map" resultClass="java.util.HashMap">
+        select a.aac002
+               ,a.aac003
+               ,pkg_common.fun_getAaa103('AAC004',a.aac004)
+               ,a.aac001, 
+  		       c.aab999,
+  		       d.aab069  AS outstring
+        from ac01 a, ab01 c,ae10 d ,(select distinct g.aac001 as aac001,g.aab001 as aab001 
+  		                               from ac20 g ,ac01 f
+  		                              where g.aac001 = f.aac001
+  		                              <!-- 调用SQL前先将身份证 做升位处理 -->
+  		                                and (f.aac002 LIKE #inputstring#||'%' or 
+  		                                     f.aac002 = pkg_common.fun_p_getid(#inputstring#) or
+                                             f.aac003 LIKE #inputstring#||'%' or 
+                                             f.aac001 like #inputstring#||'%')
+  		                               <!-- ( select max(e.aaz157) as aaz157
+  		                                                from ac20 e,ac01 f
+  		                                               where e.aac001 = f.aac001 
+                                                    <isNotEmpty prepend="AND" property="yab139">
+	                                                         f.YAB003 = #yab139#
+	                                                 </isNotEmpty>
+  		                                         AND (f.aac002 LIKE #inputstring#||'%' OR  
+  		                                              f.aac003 LIKE #inputstring#||'%' or 
+  		                                              f.aac001 like #inputstring#||'%')
+		                                         group by e.aaz159
+		                                         ) h
+		                              where g.aaz157 = h.aaz157   -->  
+		                                 )b
+         where a.aac001 = b.aac001(+) 
+  		  AND b.aab001 = c.aab001(+)
+  		  and c.aab001 = d.AAZ001(+)
+  		  <!-- 
+          <isNotEmpty prepend="AND" property="yab139">
+	        a.YAB003 = #yab139#
+	      </isNotEmpty>  -->
+  		  AND (a.aac002 like #inputstring#||'%' or 
+  		       a.aac002 = pkg_common.fun_p_getid(#inputstring#) or
+  		       a.aac003 like #inputstring#||'%' or 
+  		       a.aac001 like #inputstring#||'%' )
+          <![CDATA[ and rownum <100     ]]>
+          order by a.aac002
+    </select>
+     
+      <!-- 个人参保信息变更 汤尊 -->
+     <select id="getInsuChange" parameterClass="map" resultClass="java.util.HashMap">	         
+	  SELECT COMM.COMMENTS AS aae155,
+        CASE
+         WHEN (SELECT COUNT(1)
+                 FROM AA10A1
+                WHERE AAA100 = UPPER(AC24.aae122)
+                  AND AAA102 = AC24.AAE123) > 0 THEN
+          (SELECT aaa103 FROM AA10A1
+            WHERE AAA100 = UPPER(AC24.aae122)
+              AND AAA102 = AC24.AAE123)
+         ELSE
+          AC24.AAE123
+       END AS AAE123,
+	         
+	         CASE
+         WHEN (SELECT COUNT(1)
+                 FROM AA10A1
+                WHERE AAA100 = UPPER(AC24.aae122)
+                  AND AAA102 = AC24.AAE124) > 0 THEN
+          (SELECT aaa103 FROM AA10A1
+            WHERE AAA100 = UPPER(AC24.aae122)
+              AND AAA102 = AC24.AAE124)
+         ELSE
+          AC24.AAE124
+       END AS AAE124,
+        AC01.AAC003,
+        AC01.AAC002,
+        AC05.AAE140,
+        AC05.AAE035,
+        J.AAC003 AS JBR,
+	    TO_CHAR(AC23.AAE036, 'YYYY-MM-DD') AAE036,
+	    F.AAC003 AS FHR,
+	    TO_CHAR(AC23.AAE015, 'YYYY-MM-DD') AAE015
+   FROM AC01              AC01,
+        AC05              AC05,
+        AC23              AC23,
+        AC24              AC24,
+        USER_COL_COMMENTS COMM,
+        AD53A4           J,
+        AD53A4           F
+  WHERE AC01.AAC001 = AC05.AAC001
+    AND AC05.AAZ163 = AC23.AAZ163
+    AND AC05.AAZ203 = AC24.AAZ203
+    AND UPPER(AC24.AAE157) = COMM.TABLE_NAME
+    AND UPPER(AC24.AAE122) = COMM.COLUMN_NAME
+	     AND AC23.AAE011 = J.YAE092
+	     AND AC23.AAE014 = F.YAE092
+	     <isNotEmpty prepend="AND" property="aac058"> 
+	     	AC01.AAC058 = #aac058#
+	     </isNotEmpty>
+	     <isNotEmpty prepend="AND" property="aac001"> 
+	     	AC01.AAC001 = #aac001#
+	     </isNotEmpty>
+	     <isNotEmpty prepend="AND" property="jbr"> 
+	     	J.AAC003 = #jbr#
+	     </isNotEmpty>
+	     <isNotEmpty prepend="AND" property="jbr"> 
+	     	J.aae011 = #jbr#
+	     </isNotEmpty>
+	     <isNotEmpty prepend="AND" property="yab003"> 
+	     	J.yab003 = #yab003#
+	     </isNotEmpty>
+	     <isNotEmpty prepend="AND" property="fhr"> 
+	     	F.AAC003 = #fhr#
+	     </isNotEmpty>
+	     <isNotEmpty prepend="AND" property="aae016"> 
+	     	AC23.AAE016 = #aae016#
+	     </isNotEmpty>
+	     <isNotEmpty prepend="AND" property="aae036"> 
+	     	TO_CHAR(AC23.AAE036, 'YYYY-MM-DD') = #aae036#
+	     </isNotEmpty>
+	     <isNotEmpty prepend="AND" property="aae122"> 
+	     	AC24.AAE122 = #aae122#
+	     </isNotEmpty>
+	     order by AC05.AAE140
+     </select>
+     <!-- 参加工伤保险人员及基金征缴情况 汤尊-->
+    <select id="queryPrintTbp32List" parameterClass="map" resultClass="java.util.HashMap">
+         select tbp32.aaz002 as aaz002, <!-- 业务流水号           -->
+				tbp32.aae002 as aae002, <!-- 统计期号             -->
+				tbp32.yae270 as yae270, <!-- 甲栏序号             -->
+				tbp32.yae271 as yae271, <!-- 甲栏序号指标         -->
+				tbp32.yae278 as yae278, <!-- 可用标志             -->
+				tbp32.yab139 as yab139, <!-- 参保所属经办机构     -->
+				tbp32.aab301 as aab301, <!-- 行政区划             -->
+				tbp32.yae300 as yae300, <!-- 参保单位户数         -->
+				tbp32.yae301 as yae301, <!-- 参保单位户数#缴费单位-->
+				tbp32.yae302 as yae302, <!-- 参保人数             -->
+				tbp32.yae303 as yae303, <!-- 参保人数#农民工人数  -->
+				tbp32.yae304 as yae304, <!-- 缴费人数期末数       -->
+				tbp32.yae305 as yae305, <!-- 缴费人数平均数       -->
+				tbp32.yae306 as yae306, <!-- 缴费基数总额         -->
+				tbp32.yae307 as yae307, <!-- 期初欠费             -->
+				tbp32.yae308 as yae308, <!-- 本期应缴             -->
+				tbp32.yae309 as yae309, <!-- 本期实缴             -->
+				tbp32.yae310 as yae310, <!-- 本期补缴             -->
+				tbp32.yae311 as yae311  <!-- 期末累计欠费         -->
+           from tbp32,tbp00
+          where tbp00.aaz002 = tbp32.aaz002
+            and tbp00.aae001 = #aae001#
+            and tbp00.ayz001 = #ayz001#
+            and tbp00.aae016 = '1'
+            and tbp32.yae278 = '1'  <!-- 可用数据标志 -->
+            and tbp32.yab139 = #yab139#
+            order by tbp32.yae270 
+    </select>
+     <!-- 单位补缴通知查询 汤尊 -->
+   <select id="queryCorpArrearPay" parameterClass="map" resultClass="java.util.HashMap">
+   	SELECT 
+   	d.aaz001 AS aab001,	<!-- 单位ID -->
+   	d.aab069 AS aab069,	<!-- 单位名称 -->
+   	c.aae019 AS aae019,	<!-- 金额 -->
+   	a.aae002 AS aae002,	<!-- 费款所属期 -->
+   	a.aaa121 AS aaa121,	<!-- 业务类型编码 -->
+   	a.aaz288 AS aaz288,	<!-- 征集通知ID -->
+   	c.aaz075 AS aaz075,	<!-- 当事人欠费补缴通知ID -->
+   	a.aab999 as aab999
+   	FROM ad21 a,ae26 b,ae24 c,ae10 d
+   	WHERE 1 = 1
+   	AND a.aaz288 = b.aaz288
+   	AND b.aaz075 = c.aaz075
+   	AND c.aaz010 = d.aaz001
+   	AND c.aae016 = '1'
+   	AND (a.aae142 != '1' OR a.aae142 != '5')
+   	AND c.aae137 = '2'
+   	<isNotEmpty prepend="AND" property="aab001">   	<!-- 单位ID -->
+   		c.aaz010 = #aab001:VARCHAR#
+	</isNotEmpty>
+	<isNotEmpty prepend="AND" property="aae002">   	<!-- 费款所属期 -->
+		a.aae002 = #aae002:VARCHAR#
+	</isNotEmpty>
+	<isNotEmpty prepend="AND" property="yab139">   	<!-- 参保所属分中心 -->
+		a.yab139 = #yab139:VARCHAR#
+	</isNotEmpty>
+   </select>
+   
+   <!-- 单位补缴通知查询明细 汤尊-->
+   <select id="queryCorpArrearPayDetail" parameterClass="map" resultClass="java.util.HashMap">
+   	SELECT 
+   	a.aae003 AS aae003,	<!-- 对应费款所属期 -->
+   	a.aae140 AS aae140,	<!-- 险种类型 -->
+   	a.aae020 AS aae020,	<!-- 单位应缴金额 -->
+   	a.aae021 AS aae021,	<!-- 单位缴划账户额 -->
+   	a.aae022 AS aae022,	<!-- 个人应缴金额 -->
+   	a.aae023 AS aae023,	<!-- 个人缴划账户额 -->
+   	a.aae024 AS aae024,	<!-- 财政补助额 -->
+   	a.aae025 AS aae025,	<!-- 财政补助划账户额 -->
+   	a.aae056 AS aae056	<!-- 应缴滞纳金 -->
+   	FROM ab43 a
+   	WHERE 1 = 1
+   	AND a.aaz075 = #aaz075#
+   </select>
+   <!-- 查询征集通知 汤尊 -->
+    <select id="queryCorpCollectionNotice" parameterClass="map" resultClass="java.util.HashMap">
+   	SELECT distinct
+   	a.aae281 as aae281,
+	a.aaz288 AS aaz288,	<!-- 征集通知ID -->
+	d.aab999 as aab999,
+	d.aab001 AS aab001,	<!-- 单位ID -->
+	d.aab069 AS aab069,	<!-- 单位名称 -->
+	c.aae019 AS aae019,	<!-- 征集总额 -->
+	a.aae002 AS aae002,	<!-- 费款所属期 -->
+	a.aaa121 AS aaa121,	<!-- 业务类型编码 -->
+	c.aaz083 AS aaz083,	<!-- 当事人征缴计划事件ID -->
+	C.AAE078 AS AAE078, <!-- 足额标志 -->
+    C.AAE140 AS AAE140,
+    C.AAE341 AS AAE341, <!-- 筹资项目 -->
+    C.AAE003 AS AAE003  <!-- 对应费款所属期 -->
+	FROM ad21 a,ae25 b,ae23 c,v_ae10 d
+	WHERE a.aaz288 = b.aaz288
+	AND b.aaz083 = c.aaz083
+	AND c.aaz010 = d.aab001
+	AND c.aae016 = '1'
+	<![CDATA[ AND (a.aae142 <> '1' OR a.aae142 <> '5') ]]>
+	<isNotEmpty prepend="AND" property="aab001">   	<!-- 单位ID -->
+		<![CDATA[ c.aaz010 = #aab001:VARCHAR# ]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="AND" property="aae002">   	<!-- 费款所属期 -->
+		<![CDATA[ a.aae002 = #aae002:VARCHAR# ]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="AND" property="yab139">   	<!-- 参保所属分中心 -->
+		<![CDATA[ a.yab139 = #yab139:VARCHAR# ]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="AND" property="aae140">   	<!-- 参保所属分中心 -->
+		<![CDATA[ c.aae140 = #aae140:VARCHAR# ]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="AND" property="aab999">   	<!-- 参保所属分中心 -->
+		<![CDATA[ d.aab999 like '%'||#aab999:VARCHAR#||'%' ]]>
+	</isNotEmpty>
+	order by d.aab999,c.aae140,a.aae281
+   </select>
+   
+   <!-- 查询征集通知明细 汤尊 -->
+   <select id="queryCorpCollectionNoticeDetail" parameterClass="map" resultClass="java.util.HashMap">
+   	SELECT 
+	a.aae003 AS aae003,	<!-- 对应费款所属期 -->
+	a.aaa115 AS aaa115,	<!-- 应缴类型 -->
+	a.aae140 AS aae140,	<!-- 险种类型 -->
+	a.aae020 AS aae020,	<!-- 单位应缴金额 -->
+	a.aae021 AS aae021,	<!-- 单位缴划账户额 -->
+	a.aae022 AS aae022,	<!-- 个人应缴金额 -->
+	a.aae023 AS aae023,	<!-- 个人缴划账户额 -->
+	a.aae024 AS aae024,	<!-- 财政补助额 -->
+	a.aae025 AS aae025,	<!-- 财政补助划账户额 -->
+	a.aae056 AS aae056	<!-- 应缴滞纳金 -->
+	FROM ab07 a
+	WHERE 1=1
+	AND a.aaz083 = #aaz083#	<!-- 当事人征缴计划事件ID -->
+   </select>
+   
+   <!-- 获取单位基本信息 汤尊(不验证分中心)-->
+    <select id="getCzAb01ListByAsnSICP3WZC" parameterClass="map" resultClass="java.util.HashMap">
+        select b.aab999 as aab999,
+               a.aab069 as aab069,
+              PKG_COMMON.fun_getAaa103('AAB065',b.aab065) as aab065,
+               b.aab001 as aab001
+               
+        from ae17 a,ab24 b
+        where a.aaz002 = b.aaz002
+         and (b.aab999 like '%'||#inputstring#||'%'
+          or a.aab069 like '%'||#inputstring#||'%')
+          <isNotEmpty prepend="AND" property="yab139">
+	        b.yab003 = #yab139#
+	      </isNotEmpty>
+          <![CDATA[ and rownum <100     ]]>
+    </select> 
+    <!-- 增员汤尊-->
+	<select id="getPersonAdd" parameterClass="map" resultClass="dto">
+		 select distinct a.aac001, 
+		                 b.aac002,
+		                 b.aac003,
+		                 c.aab069,
+		                 a.aac050,
+		                 b.aac999
+		   from ac05 a ,ac01 b,ae10 c
+          where a.aac001 = b.aac001
+            and a.aab001 = c.aaz001
+             and a.yab139 = #yab139# 
+            <isNotEmpty prepend="AND" property="begin">
+           <![CDATA[ a.aae035 >= to_date(#begin#||'00:00:01','YYYY-MM-DD hh24:mi:ss') ]]>  <!--开始时间 -->
+            </isNotEmpty>
+            <isNotEmpty prepend="AND" property="end">
+           <![CDATA[ a.aae035 <= to_date(#end#||'23:59:59','YYYY-MM-DD hh24:mi:ss')]]> <!--结束时间 --> 
+     		</isNotEmpty> 
+            and a.aac050 in(11,12,13,14)
+            <isNotEmpty prepend="AND" property="aac050">
+            a.aac050 = #aac050#
+            </isNotEmpty>
+            <isNotEmpty prepend="AND" property="aab001">
+            a.aab001 = #aab001#
+            </isNotEmpty>
+            <isNotEmpty prepend="AND" property="aac001">
+            a.aac001 = #aac001#
+            </isNotEmpty>
+	 </select>
+	 
+	<!-- 减员 汤尊-->
+		<select id="getPersonDel" parameterClass="map" resultClass="dto">
+		 select distinct a.aac001,
+		                 b.aac002,
+		                 b.aac003,
+		                 c.aab069,
+		                 a.aac050,
+		                 b.aac999 
+		   from ac05 a ,ac01 b,ae10 c
+          where a.aac001 = b.aac001
+            and a.aab001 = c.aaz001
+          <!--  and a.yab139 = #yab139# --> 
+            <isNotEmpty prepend="AND" property="begin">
+           <![CDATA[ a.aae035 >= to_date(#begin#||'00:00:01','YYYY-MM-DD hh24:mi:ss') ]]>  <!--开始时间 -->
+            </isNotEmpty>
+            <isNotEmpty prepend="AND" property="end">
+           <![CDATA[ a.aae035 <= to_date(#end#||'23:59:59','YYYY-MM-DD hh24:mi:ss')]]> <!--结束时间 --> 
+     		</isNotEmpty> 
+            and a.aac050 in (21,22,23,24,25)
+            <isNotEmpty prepend="AND" property="aac050">
+            a.aac050 = #aac050#
+            </isNotEmpty>
+            <isNotEmpty prepend="AND" property="aab001">
+            a.aab001 = #aab001#
+            </isNotEmpty>
+            <isNotEmpty prepend="AND" property="aac001">
+            a.aac001 = #aac001#
+            </isNotEmpty>
+	 </select>
+	 <!-- 查询城居乡镇下拉列表 汤尊 2012-07-31 -->
+    <select id="queryAaf015" parameterClass="map" resultClass="dto">
+       select distinct aaf013,aaf031
+         from af08
+        where 1 = 1
+        <isNotEmpty prepend="AND" property="aab301">   <!-- 行政区划 -->
+           aab301 = #aab301#              
+        </isNotEmpty>
+        order by aaf013
+    </select>
+     <!-- 查询城居乡镇信息 汤尊 2012-07-31 -->
+    <select id="queryCJXZList" parameterClass="map" resultClass="java.util.HashMap">
+         select a.aaf031 as aaf031,
+				a.aaf013 as aaf013,
+				a.aab301 as aab301,
+				a.aae004 as aae004,
+				a.aae005 as aae005,
+				a.aae006 as aae006,
+				a.aae007 as aae007,
+				a.aae159 as aae159,
+				a.prseno as prseno,
+				a.aae011 as aae011,
+				a.aae036 as aae036,
+				a.yab003 as yab003
+           from af08 a
+           where 1 = 1
+           <!--  AND b.yab003 = substr(#yab003#,1,6) --> 
+          <isNotEmpty prepend="AND" property="aaf016">   <!-- 行政区代码 -->
+			    a.aab301 = #aaf016#
+		  </isNotEmpty>
+		  <isNotEmpty prepend="AND" property="aaf015">   <!-- 所属乡镇街道 -->
+			    a.aaf013 = #aaf015#
+		  </isNotEmpty>
+    </select>
+    <!-- 查询城居社区信息 汤尊 2012-07-31 -->
+    <select id="queryCJSQList" parameterClass="map" resultClass="dto">
+        SELECT a.aaf030 as aaf030,   <!-- 社区编号 -->
+		       a.aaz070 as aaz070,   <!-- 社区ID   -->
+		       a.aaf016 as aaf016,   <!-- 所属县级行政区 -->
+		       a.aaf015 as aaf015,   <!-- 所属乡镇街道 -->
+		       a.aaf019 as aaf019,   <!-- 社区或村类别 -->
+		       b.aab069 as aab069,	 <!-- 名称   -->
+		       b.aab003 as aab003,	 <!-- 组织机构代码   -->
+		       b.aab013 as aab013	 <!-- 法定代表人姓名   -->
+		  FROM af02 a,ae10 b
+	     WHERE a.aaz070 = b.aaz001
+	      <!--  AND b.yab003 = substr(#yab003#,1,6) --> 
+		<isNotEmpty prepend="AND" property="aaf030">   <!-- 社区编号 -->
+			a.aaf030 = #aaf030#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="aaf017">   <!-- 所属市级行政区 -->
+			a.aaf017 = #aaf017#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="aaf016">   <!-- 所属县级行政区 -->
+			a.aaf016 = #aaf016#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="aaf015">   <!-- 所属乡镇街道 -->
+			a.aaf015 = #aaf015#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="aaf019">   <!-- 社区类型   -->
+			a.aaf019 = #aaf019#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="aab003">   <!-- 组织机构代码  -->
+			b.aab003 = #aab003#
+		</isNotEmpty>	
+    </select>
+     <!-- 报表管理过程调用 -->
+    <parameterMap id="prc_P_rePrintManegeMap" class="map"> 
+	    <parameter property="prm_YAE266"  jdbcType="VARCHAR"   	javaType="java.lang.String"      mode="IN"/>	<!-- 报表类型编码 -->
+	    <parameter property="prm_YAE267"  jdbcType="VARCHAR"   	javaType="java.lang.String"      mode="IN"/>	<!-- 报表类型(年报、季报、月报)-->
+	    <parameter property="prm_AAE001"  jdbcType="NUMERIC"   	javaType="java.math.BigDecimal"  mode="IN"/>	<!-- 报表年度 -->
+	    <parameter property="prm_AYZ001"  jdbcType="VARCHAR"    javaType="java.lang.String"      mode="IN"/>	<!-- 报表季度 -->
+	    <parameter property="prm_AAE002"  jdbcType="NUMERIC"   	javaType="java.math.BigDecimal"  mode="IN"/>	<!-- 报表月度 -->
+	    <parameter property="prm_AAE011"  jdbcType="VARCHAR"   	javaType="java.lang.String"      mode="IN"/> 	<!-- 经办人-->
+	    <parameter property="prm_YAB003"  jdbcType="VARCHAR"   	javaType="java.lang.String"      mode="IN"/>	<!-- 经办人经办机构 -->
+	    <parameter property="prm_AAE414"  jdbcType="VARCHAR"   	javaType="java.lang.String"      mode="IN"/>    <!-- 经办人姓名 -->
+	    <parameter property="prm_AAE036"  jdbcType="DATE"      	javaType="java.util.Date"        mode="IN"/>	<!-- 经办时间 -->
+        <parameter property="AppCode"     jdbcType="VARCHAR"   	javaType="java.lang.String"      mode="OUT"  nullValue=""/> 
+	    <parameter property="ErrorMsg"    jdbcType="VARCHAR"   	javaType="java.lang.String"      mode="OUT"  nullValue=""/> 
+ 	</parameterMap>   
+	<procedure id="prc_P_rePrintManege" parameterMap="prc_P_rePrintManegeMap"> 
+		{call pkg_P_rePrintManege.prc_P_rePrintManege(?,?,?,?,?,?,?,?,?,?,?)}
+	</procedure>
+    
+	<!-- 查询行政区划 -->
+	<select id="queryAaf016ByAaf017" parameterClass="map" resultClass="dto">
+		SELECT 
+		       a.aaa102 as aaa102,
+		       a.aaa103 as aaa103
+		  FROM aa10 a 
+	     WHERE a.aaa102 like substr(to_char(#aaf017#),0,4)||'%'
+	       AND aaa100 ='AAB301'
+	     ORDER BY a.aaa102 asc
+	</select>
+	<select id="getaae140_aae061" parameterClass="map" resultClass="dto">
+		     select aae061, 
+		     sum(to_number(aae140)) as aae140
+               from jfk_ac10 a
+              where a.aae061 = #aae061#
+              and a.aaa027 = #aaa027#
+              group by aae061
+	</select>
+	
+	<!-- 查询个人账户 -->
+	<select id="getac51k1" parameterClass="map" resultClass="dto">
+		select c.aab999 as aab999,
+		       c.aab069 as aab069,
+		       c.aab065 as aab065,
+		       b.aac999 as aac999,
+		       b.aac001 as aac001,
+		       b.aac002 as aac002,
+		       b.aac003 as aac003,
+		       a.aae001 as aae001,
+		       a.yke132 as yke132,
+		       a.yke133 as yke133,
+		       a.yke134 as yke134,
+		       a.yke135 as yke135,
+		       a.yke136 as yke136,
+		       a.yke137 as yke137,
+		       a.yke138 as yke138,
+		       a.yke139 as yke139,
+		       a.yke140 as yke140,
+		       a.yke141 as yke141,
+		       a.yke142 as yke142,
+		       a.yke143 as yke143,
+		       a.yke144 as yke144,
+		       a.yke145 as yke145,
+		       a.yke146 as yke146,
+		       d.aac031 as aac031,
+		       a.aae240 as aae240
+		  from ac51k1 a,ac01 b,v_ae10 c,ac20 d
+		 where a.aac001 = b.aac001
+		   and a.aac001 = d.aac001
+		   and d.aab001 = c.aab001
+		   and d.aae140 in('310','390')
+		   <isNotEmpty prepend="AND" property="yab139">   
+			d.yab139 = #yab139#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aab999">   
+			c.aab999 = #aab999#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aab069">   
+			c.aab069 = #aab069#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aac999">   
+			b.aac999 = #aac999#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aac002">   
+			b.aac002 = #aac002#
+		   </isNotEmpty>	
+		   <isNotEmpty prepend="AND" property="aac003">   
+			b.aac003 = #aac003#
+		   </isNotEmpty>	
+		   <isNotEmpty prepend="AND" property="aae001">   
+			a.aae001 = #aae001#
+		   </isNotEmpty>	
+		   <isNotEmpty prepend="AND" property="akc087">   
+			<![CDATA[  a.aae240 > #akc087# ]]>
+		   </isNotEmpty>
+		   order by b.aac999,a.aae001
+	</select>
+	
+	<!-- 缴费卡信息查询 -->
+	<select id="getjfk_ac10" parameterClass="map" resultClass="dto">
+		select c.aab999 as aab999,
+		       c.aab069 as aab069,
+		       c.aab065 as aab065,
+		       b.aac001 as aac001,
+		       b.aac999 as aac999,
+		       b.aac002 as aac002,
+		       b.aac003 as aac003,
+		       a.akc521 as aac066,
+		       a.ksqh   as ksqh,
+		       a.zzqh   as zzqh,
+		       a.aae061 as aae061,
+		       a.jfje   as jfje,
+		       a.znj    as znj,
+		       a.jfje + a.znj as jfze,
+		       a.aae140 as aae140,
+		       a.dkbz   as dkbz,
+		       to_char(a.aae036,'yyyy-mm-dd hh24:mi:ss') as aae036,
+		       a.yae027 as yae027,
+		       to_char(a.aae037,'yyyy-mm-dd hh24:mi:ss') as aae037,
+		       a.aaa027 as aaa027,
+		       to_char(d.aae037,'yyyy-mm-dd hh24:mi:ss') as aae038,
+		       d.bz     as bz,
+		       b.yac511 as yac511
+          from jfk_ac10 a,ac01 b,v_ae10 c,jfk_js d
+         where a.aac001 = b.aac001
+           and a.aab001 = c.aab001
+           and a.aae061 = d.aae061(+)
+           <isNotEmpty prepend="AND" property="yac511">   
+			a.yac511 = #yac511#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aac066">   
+			a.akc521 = #aac066#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aaa027">   
+			a.aaa027 = #aaa027#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aab999">   
+			c.aab999 = #aab999#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aab069">   
+			c.aab069 = #aab069#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aac999">   
+			b.aac999 = #aac999#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aac002">   
+			b.aac002 = #aac002#
+		   </isNotEmpty>	
+		   <isNotEmpty prepend="AND" property="aac003">   
+			b.aac003 = #aac003#
+		   </isNotEmpty>	
+		   <isNotEmpty prepend="AND" property="aae030">   
+			<![CDATA[  to_char(a.aae036,'yyyy-mm-dd') >= #aae030# ]]>
+		   </isNotEmpty>	
+		   <isNotEmpty prepend="AND" property="aae031">   
+			<![CDATA[  to_char(a.aae036,'yyyy-mm-dd') <= #aae031# ]]>
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aae140">   
+			a.aae140 = #aae140#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aac066">   
+			a.akc521 = #aac066#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="dkbz">   
+			a.dkbz = #dkbz#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="yae027">   
+			a.dkbz = #yae027#
+		   </isNotEmpty>
+		   order by a.aae061,a.aae140
+	</select>
+	<!-- 缴费卡回退信息查询 -->
+	<select id="getjfk_ac10_htcx" parameterClass="map" resultClass="dto">
+		select c.aab999 as aab999,
+		       c.aab069 as aab069,
+		       c.aab065 as aab065,
+		       b.aac001 as aac001,
+		       b.aac999 as aac999,
+		       b.aac002 as aac002,
+		       b.aac003 as aac003,
+		       a.akc521 as aac066,
+		       a.ksqh   as ksqh,
+		       a.zzqh   as zzqh,
+		       a.aae061 as aae061,
+		       a.jfje   as jfje,
+		       a.znj    as znj,
+		       a.jfje + a.znj as jfze,
+		       a.aae140 as aae140,
+		       a.dkbz   as dkbz,
+		       to_char(a.aae036,'yyyy-mm-dd hh24:mi:ss') as aae036,
+		       a.yae027 as yae027,
+		       to_char(a.aae037,'yyyy-mm-dd hh24:mi:ss') as aae037,
+		       a.aaa027 as aaa027,
+		       to_char(d.aae037,'yyyy-mm-dd hh24:mi:ss') as aae038,
+		       d.bz     as bz,
+		       b.yac511 as yac511
+          from jfk_ac10 a,ac01 b,v_ae10 c,jfk_js d
+         where a.aac001 = b.aac001
+           and a.aab001 = c.aab001
+           and a.aae061 = d.aae061(+)
+           and <![CDATA[  clbz != 1 ]]>
+           <isNotEmpty prepend="AND" property="yac511">   
+			a.yac511 = #yac511#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aac066">   
+			a.akc521 = #aac066#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aaa027">   
+			a.aaa027 = #aaa027#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aab999">   
+			c.aab999 = #aab999#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aab069">   
+			c.aab069 = #aab069#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aac999">   
+			b.aac999 = #aac999#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aac002">   
+			b.aac002 = #aac002#
+		   </isNotEmpty>	
+		   <isNotEmpty prepend="AND" property="aac003">   
+			b.aac003 = #aac003#
+		   </isNotEmpty>	
+		   <isNotEmpty prepend="AND" property="aae030">   
+			<![CDATA[  to_char(a.aae036,'yyyy-mm-dd') >= #aae030# ]]>
+		   </isNotEmpty>	
+		   <isNotEmpty prepend="AND" property="aae031">   
+			<![CDATA[  to_char(a.aae036,'yyyy-mm-dd') <= #aae031# ]]>
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aae140">   
+			a.aae140 = #aae140#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aac066">   
+			a.akc521 = #aac066#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="dkbz">   
+			a.dkbz = #dkbz#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="yae027">   
+			a.yae027 = #yae027#
+		   </isNotEmpty>
+		   order by a.aae061,a.aae140
+	</select>
+	<!-- 缴费应收核定查询 -->
+	<select id="getjfk_ac10_yshd" parameterClass="map" resultClass="dto">
+		select c.aab999 as aab999,
+		       c.aab069 as aab069,
+		       c.aab065 as aab065,
+		       b.aac001 as aac001,
+		       b.aac999 as aac999,
+		       b.aac002 as aac002,
+		       b.aac003 as aac003,
+		       a.akc521 as aac066,
+		       a.ksqh   as ksqh,
+		       a.zzqh   as zzqh,
+		       a.aae061 as aae061,
+		       a.jfje   as jfje,
+		       a.znj    as znj,
+		       a.jfje + a.znj as jfze,
+		       a.aae140 as aae140,
+		       a.dkbz   as dkbz,
+		       to_char(a.aae036,'yyyy-mm-dd hh24:mi:ss') as aae036,
+		       a.yae027 as yae027,
+		       to_char(a.aae037,'yyyy-mm-dd hh24:mi:ss') as aae037,
+		       a.aaa027 as aaa027,
+		       to_char(d.aae037,'yyyy-mm-dd hh24:mi:ss') as aae038,
+		       d.bz     as bz,
+		       b.yac511 as yac511
+          from jfk_ac10 a,ac01 b,v_ae10 c,jfk_js d
+         where a.aac001 = b.aac001
+           and a.aab001 = c.aab001
+           and a.aae061 = d.aae061(+)
+           and a.aae061 = #aae061#
+		   order by a.aae061,a.aae140
+	</select>
+	<select id="getjfk_ac10YAE097" parameterClass="map" resultClass="dto">
+		select distinct
+		       c.aab999 as aab999,
+		       c.aab069 as aab069,
+		       c.aab065 as aab065,
+		       b.aac001 as aac001,
+		       b.aac999 as aac999,
+		       b.aac002 as aac002,
+		       b.aac003 as aac003,
+		       a.akc521 as aac066,
+		       a.ksqh   as ksqh,
+		       a.zzqh   as zzqh,
+		       a.aae061 as aae061,
+		       a.jfje   as jfje,
+		       a.znj    as znj,
+		       a.jfje + a.znj as jfze,
+		       a.aae140 as aae140,
+		       a.dkbz   as dkbz,
+		       to_char(a.aae036,'yyyy-mm-dd hh24:mi:ss') as aae036,
+		       a.yae027 as yae027,
+		       to_char(a.aae037,'yyyy-mm-dd hh24:mi:ss') as aae037,
+		       a.aaa027 as aaa027,
+		       to_char(d.aae037,'yyyy-mm-dd hh24:mi:ss') as aae038,
+		       d.bz     as bz,
+		       b.yac511 as yac511
+          from jfk_ac10 a,ac01 b,v_ae10 c,jfk_js d
+         where a.aac001 = b.aac001
+           and a.aab001 = c.aab001
+           and a.aae061 = d.aae061(+) 
+           <isNotEmpty prepend="AND" property="yae097">   
+			a.zzqh = #yae097#
+		   </isNotEmpty>
+           <isNotEmpty prepend="AND" property="aab065">   
+			c.aab065 = #aab065#
+		   </isNotEmpty>
+           <isNotEmpty prepend="AND" property="yac511">   
+			a.yac511 = #yac511#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aac066">   
+			a.akc521 = #aac066#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aaa027">   
+			a.aaa027 = #aaa027#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aab999">   
+			c.aab999 = #aab999#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aab069">   
+			c.aab069 = #aab069#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aac999">   
+			b.aac999 = #aac999#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aac002">   
+			b.aac002 = #aac002#
+		   </isNotEmpty>	
+		   <isNotEmpty prepend="AND" property="aac003">   
+			b.aac003 = #aac003#
+		   </isNotEmpty>	
+		   <isNotEmpty prepend="AND" property="aae030">   
+			<![CDATA[  to_char(a.aae036,'yyyy-mm-dd') >= #aae030# ]]>
+		   </isNotEmpty>	
+		   <isNotEmpty prepend="AND" property="aae031">   
+			<![CDATA[  to_char(a.aae036,'yyyy-mm-dd') <= #aae031# ]]>
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aae140">   
+			a.aae140 = #aae140#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aac066">   
+			a.akc521 = #aac066#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="dkbz">   
+			a.dkbz = #dkbz#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="yae027">   
+			a.dkbz = #yae027#
+		   </isNotEmpty>
+		   order by a.aae061,a.aae140
+	</select>
+	<!-- 居民参保情况表 -->
+	<select id="getbb_jm001" parameterClass="map" resultClass="dto">
+       select to_char(AAE030,'yyyy-mm-dd') as aae030,
+       to_char(AAE031,'yyyy-mm-dd') as aae031,
+       AAC066,
+       CBRS01,
+       JFRS02,
+       JFBZ03,
+       JFBZ04,
+       JFBZ05,
+       JFBZ06,
+       JFBZ07,
+       JFBZ08,
+       YJJE09,
+       YJJE10,
+       YJJE11,
+       YJJE12,
+       YJJE13,
+       YJJE14,
+       SJJE15,
+       SJJE16,
+       SJJE17,
+       SJJE18,
+       SJJE19,
+       SJJE20,
+       AAE036,
+       AAE011,
+       AAE414,
+       YAB003,
+       AAB301,
+       AAE100,
+       PRSENO
+         from bb_jm001
+        where aae100 = '1'
+           <isNotEmpty prepend="AND" property="aae030">   
+			  to_char(aae030,'yyyymm') = #aae030#
+		   </isNotEmpty>
+		    <isNotEmpty prepend="AND" property="yab003">   
+			  yab003 = #yab003#
+		   </isNotEmpty>
+		order by aab301,aae030,aac066
+	</select>
+	
+	<!-- 居民参保情况表 -->
+	<select id="getbb_yl001" parameterClass="map" resultClass="dto">
+       select *
+         from bb_yl001
+        where aae100 = '1'
+           <isNotEmpty prepend="AND" property="aae030">   
+			  to_char(aae030,'yyyymm') = #aae030#
+		   </isNotEmpty>
+		order by aaa027,aae030,to_number(dwlb)
+	</select>
+	
+	<select id="queryJFJS" parameterClass="map" resultClass="dto">
+		select distinct
+		       b.aac999 as aac999,
+		       a.aae149 as aae149,
+		       a.aae180 as aae180,
+		       a.aac040 as aac040,
+		       c.aab069 as aab069,
+		       c.aab999 as aab999,
+		       c.aab001 as aab001,
+		       b.aac003 as aac003,
+		       b.aac002 as aac002,
+		       b.aac001 as aac001,
+		       b.aac084 as aac084,
+		       d.aac031 as aac031,
+		       a.aae140 as aae140
+		  from ac04 a, ac01 b, v_ae10 c, ac20 d
+		 where a.aac001 = b.aac001
+		   and a.aac001 = d.aac001
+		   and a.aae140 = d.aae140
+		   and d.aab001 = c.aab001
+		   and b.aac001 = d.aac001
+		   and d.aab001 = c.aab001
+		   and d.yab139 = #yab003#
+		   <isNotEmpty prepend="AND" property="aac999">   
+			  b.aac999 = #aac999#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aac084">   
+			  b.aac084 = #aac084#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aac031">   
+			  d.aac031 = #aac031#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aab999">   
+			  c.aab999 = #aab999#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aae140">   
+			  a.aae140 = #aae140#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aae149b">   
+			  a.aae149 >= #aae149b#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aae149e">   
+			<![CDATA[   a.aae149 <= #aae149e# ]]>
+		   </isNotEmpty>
+	</select>
+	<!-- dyb 查询卡状态 -->
+    <select id="getAz01Of" parameterClass="map" resultClass="dto">
+		SELECT b.aac999 AS aac999,
+		       b.aac002 AS aac002,
+		       b.aac003 AS aac003,
+		       d.aab999 AS aab999,
+		       d.aab069 AS aab069,
+		       a.aaz502 AS aaz502,
+		       b.aac001 AS aac001,
+		       c.aac031 AS aac031  
+		  FROM az01 A, AC01 B, AC20 C, V_AE10 D
+		 WHERE A.AAC001 = B.AAC001
+		   AND B.AAC001 = C.AAC001
+		   AND C.AAB001 = D.AAB001  
+		   AND C.AAE140 = '310'
+		   AND a.aaa027 =#yab139#
+		   AND b.yab003 =#yab139#
+		   AND c.yab139 =#yab139#
+		   AND d.aab301 =#yab139#
+		   <isNotEmpty prepend="AND" property="aac999">
+		    b.aac001 =#aac999#
+		    </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aac999">
+		    a.aac001 =#aac999#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aac999">
+		    c.aac001 =#aac999#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aab999">   
+		    d.aab999 =#aab999#
+		   </isNotEmpty> 
+	</select>
+	<!-- 查询个人账户实收明细 -->
+    <select id="getac53" parameterClass="map" resultClass="dto">
+		SELECT b.aac999 AS aac999,
+		       b.aac002 AS aac002,
+		       b.aac003 AS aac003,
+		       d.aab999 AS aab999,
+		       d.aab069 AS aab069,
+		       a.aae058 AS aae058,
+		       b.aac001 AS aac001,
+		       a.aae228 AS aae228,
+		       a.aae003 AS aae003,
+		       c.aac031 AS aac031  
+		  FROM AC53 A, AC01 B, AC20 C, V_AE10 D
+		 WHERE A.AAC001 = B.AAC001
+		   AND B.AAC001 = C.AAC001
+		   AND C.AAB001 = D.AAB001
+		   AND C.AAE140 = '310'
+		   AND a.aaa027 =#yab139#
+		   AND b.yab003 =#yab139#
+		   AND c.yab139 =#yab139#
+		   AND d.aab301 =#yab139#
+		   <isNotEmpty prepend="AND" property="aac999">
+		    b.aac001 =#aac999#
+		    </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aac999">
+		    a.aac001 =#aac999#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aac999">
+		    c.aac001 =#aac999#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="aab999">   
+		    d.aab999 =#aab999#
+		   </isNotEmpty>
+		    <isNotEmpty prepend="AND" property="aae003_b">
+		    <![CDATA[a.aae003 >=#aae003_b#]]> 
+		   </isNotEmpty>
+		    <isNotEmpty prepend="AND" property="aae003_e">
+		    <![CDATA[a.aae003 <=#aae003_e#]]>
+		   </isNotEmpty>
+		   ORDER BY a.AAE003
+	</select>
+	<!-- 查询历史缴费信息 -->
+	<select id="queryJFJS_history" parameterClass="map" resultClass="dto">
+		    SELECT distinct b.aab999 as aab999,
+		           b.aab069 as aab069,
+		           c.aac999 as aac999,
+		           c.aac003 as aac003,
+		           c.aac002 as aac002,
+		           c.aac084 as aac084,
+		           a.aae003 as aae003,
+		           a.aae140 as aae140,
+		           a.aac040 as aac040,
+		           a.aae180 as aae180
+			  FROM ac43a1 a,v_ae10 b,ac01 c 
+			 WHERE b.aab001=a.aab001
+			   AND c.aac001=a.aac001
+			   AND b.aab999=#aab999#
+			   AND a.AAE140=#aae140#
+			   and b.aab301=#yab003#
+			   <isNotEmpty prepend="AND" property="aac999">   
+		          c.aac999 =#aac999#
+		       </isNotEmpty>
+		       <isNotEmpty prepend="AND" property="aac084">   
+		          a.aac084 =#aac084#
+		       </isNotEmpty>
+		       <isNotEmpty prepend="AND" property="aae149b">   
+		          <![CDATA[ a.aae003 >=#aae149b# ]]>
+		       </isNotEmpty>
+		       <isNotEmpty prepend="AND" property="aae149e">   
+		          <![CDATA[ a.aae003 <=#aae149e# ]]>
+		       </isNotEmpty>		       
+		   	 ORDER BY a.AAE003,c.aac999
+	</select>
+<!--YHCIPEND--> 
+</sqlMap>
